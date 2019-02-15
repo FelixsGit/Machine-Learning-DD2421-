@@ -16,51 +16,52 @@ def radial_basis_function_kernel(x, y, smooth):
     final_exp = (abs_x_minus_y_squared/(2 * math.pow(smooth, 2))) * - 1
     return math.pow(math.e, final_exp)
 
-print("linear_kernel test", linear_kernel((2, 3), (1, 1)))
-print("poly_kernel test", poly_kernel((2, 3), (1, 1), 2))
-print("rbf_kernel test", radial_basis_function_kernel((2, 3), (1, 1), 1))
+#print("linear_kernel test", linear_kernel((2, 3), (1, 1)))
+#print("poly_kernel test", poly_kernel((2, 3), (1, 1), 2))
+#print("rbf_kernel test", radial_basis_function_kernel((2, 3), (1, 1), 1))
 
 #################ASSIGMENT 2###########################################
+t_vector = (-1, -1, 1, 1, 1)
+x_vector = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5))
+N = 5
+matrix = numpy.zeros(shape=(N, N))
 
-matrix = numpy.zeros(shape=(5, 5))
 def calculate_matrix(x_vector, t_vector):
     for i in range(0, len(x_vector)):
         for j in range(0, len(x_vector)):
             matrix[i][j] = t_vector[i] * t_vector[j] * linear_kernel(x_vector[i], x_vector[j])
 
-
-calculate_matrix(((1, 1), (2, 2), (3, 3), (4, 4), (5, 5)), (1, -1, 1, -1, 1))
+calculate_matrix(x_vector, t_vector)
+start = numpy.zeros(N)
 print(matrix)
 
-def objective(vector):
-    vector_sum = numpy.sum(vector)
+def objective(alpha):
+    vector_sum = numpy.sum(alpha)
     scalar = 0
-    for i in range(0, len(vector)):
-        for j in range(0, len(vector)):
-            scalar = scalar + vector[i] * vector[j] * matrix[i][j]
-
+    for i in range(0, len(alpha)):
+        for j in range(0, len(alpha)):
+            scalar = scalar + (alpha[i] * alpha[j] * matrix[i][j])
+    #scalar = numpy.sum(numpy.dot(alpha, matrix))
     scalar = (scalar/2) - vector_sum
     return scalar
 
-print(objective((1, 2, 3, 4, 5)))
-
 ##################ASSIGMENT 3################################
 
-def zero_fun(vector, t_vector):
+def zero_fun(vector):
     return numpy.absolute(numpy.dot(vector, t_vector))
 
-print(zero_fun(((1, 1), (2, 2)), (-1, -1)))
+
 
 ##################ASSIGMENT 4################################
-
-
-x_vector = [(1, 1), (2, 2)]
-t_vector = [1, -1]
-start = numpy.zeros(10)
+XC = {'type': 'eq', 'fun': zero_fun}
+B = [(0, None) for b in range(N)]
 ret = minimize(objective, start, bounds=B, constraints=XC)
 alpha = ret['x']
-if(ret['success']):
-    for i in range (0, len(alpha)):
-        if((alpha <= 0.000001) | (alpha >= -0.000001)):
-            list.append((alpha, x_vector[i], t_vector[i]))
-
+support_vector_list = []
+print(ret)
+if ret['success']:
+    for i in range(0, len(alpha)):
+        print("Examining alpha value =", alpha[i])
+        if (alpha[i] >= 0.000001) & (alpha[i] <= -0.000001):
+            support_vector_list.append([alpha, x_vector[i], t_vector[i]])
+print("-----------> Support vector list:", support_vector_list)
