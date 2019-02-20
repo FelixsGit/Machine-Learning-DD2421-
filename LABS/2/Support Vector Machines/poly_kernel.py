@@ -4,7 +4,8 @@ import matplotlib . pyplot as plt
 
 #################ASSIGMENT 1####################################
 
-poly_val = 2
+poly_val = 3
+C = 0.3
 
 def linear_kernel(x, y):
     return numpy.dot(x, y)
@@ -20,7 +21,7 @@ def radial_basis_function_kernel(x, y, smooth):
     return math.pow(math.e, final_exp)
 
 classA = numpy.concatenate((numpy.random.randn(10,2)*0.5+[1.5,0.5], numpy.random.randn(10,2)*0.5+[-1.5,1.5]))
-classB = numpy.random.randn(20, 2)*0.5+[0.0, 1.0]
+classB = numpy.random.randn(20, 2)*0.8+[0.0, 1.0]
 
 x_vector = numpy.concatenate((classA, classB))
 t_vector = numpy.concatenate((numpy.ones(classA.shape[0]), -numpy.ones(classB.shape[0])))
@@ -107,8 +108,8 @@ grid = numpy.array([[indicator_function(support_vector_list, (x, y), b) for x in
 
 plt.plot([p[0] for p in classA], [p[1] for p in classA], 'b.')
 plt.plot([p[0] for p in classB], [p[1] for p in classB], 'r.')
-for i in range(len(support_vector_list)):
-    plt.plot([support_vector_list[i][1][0]], [support_vector_list[i][1][1]], 'y+')
+#for i in range(len(support_vector_list)):
+ #   plt.plot([support_vector_list[i][1][0]], [support_vector_list[i][1][1]], 'y+')
 
 plt.contour(xgrid, ygrid, grid, (-1.0, 0.0, 1.0), colors=('red', 'yellow', 'blue'), linewidths=(0.5, 0.5, 0.5))
 

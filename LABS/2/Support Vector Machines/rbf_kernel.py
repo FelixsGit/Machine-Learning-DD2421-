@@ -4,7 +4,8 @@ import matplotlib . pyplot as plt
 
 #################ASSIGMENT 1####################################
 
-smooth_val = 0.5
+smooth_val = 0.6
+C = 8
 
 def linear_kernel(x, y):
     return numpy.dot(x, y)
@@ -60,7 +61,7 @@ def zero_fun(vector):
 
 ##################ASSIGMENT 4################################
 XC = {'type': 'eq', 'fun': zero_fun}
-B = [(0, None) for b in range(N)]
+B = [(0, C) for b in range(N)]
 ret = minimize(objective, start, bounds=B, constraints=XC)
 print(ret)
 alpha = ret['x']
@@ -107,8 +108,8 @@ grid = numpy.array([[indicator_function(support_vector_list, (x, y), b) for x in
 
 plt.plot([p[0] for p in classA], [p[1] for p in classA], 'b.')
 plt.plot([p[0] for p in classB], [p[1] for p in classB], 'r.')
-for i in range(len(support_vector_list)):
-    plt.plot([support_vector_list[i][1][0]], [support_vector_list[i][1][1]], 'y+')
+#for i in range(len(support_vector_list)):
+ #   plt.plot([support_vector_list[i][1][0]], [support_vector_list[i][1][1]], 'y+')
 
 plt.contour(xgrid, ygrid, grid, (-1.0, 0.0, 1.0), colors=('red', 'yellow', 'blue'), linewidths=(0.5, 0.5, 0.5))
 

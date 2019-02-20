@@ -28,7 +28,7 @@ random.shuffle(permute)
 x_vector = x_vector[permute, :]
 t_vector = t_vector[permute]
 
-
+C = 0.5
 
 matrix = numpy.zeros(shape=(N, N))
 
