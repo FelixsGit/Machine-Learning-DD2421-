@@ -33,13 +33,13 @@ import random
 def computePrior(labels, W=None):
     Npts = labels.shape[0]
     if W is None:
-        W = np.ones((Npts,1))/Npts
+        W = np.ones((Npts, 1))/Npts
     else:
         assert(W.shape[0] == Npts)
     classes = np.unique(labels)
     Nclasses = np.size(classes)
 
-    prior = np.zeros((Nclasses,1))
+    prior = np.zeros((Nclasses, 1))
 
     #print("////////////////////////ASSIGMENT 2//////////////////////////")
     sum = 0
@@ -86,15 +86,14 @@ def mlParams(X, labels, W=None):
     #print()
 
     varienceTot = np.zeros((Nclasses, Ndims))
-    counter = 0
 
     for jdx, c in enumerate(classes):
         idx = np.where(labels == c)[0] # Vector of length C of indices for a given label class c
+        weightsum = sum(W[idx, :])
         for i in range(0, len(idx)):
             varienceTot[c] += W[i] * ((X[idx[i]] - mu[c]) * (X[idx[i]] - mu[c]))
-            counter += W[i]
 
-        varienceTot[c] = varienceTot[c]/counter
+        varienceTot[c] = varienceTot[c]/weightsum
         sigma[c] = np.diag(varienceTot[c])
 
     #print("SIGMA")
@@ -162,10 +161,10 @@ class BayesClassifier(object):
 #plotGaussian(X,labels,mu,sigma)
 #prior = computePrior(labels)
 #classifier = classifyBayes(X, prior, mu, sigma)
-testClassifier(BayesClassifier(), dataset='iris', split=0.7)
-testClassifier(BayesClassifier(), dataset='vowel', split=0.7)
-plotBoundary(BayesClassifier(), dataset='iris', split=0.7)
-plotBoundary(BayesClassifier(), dataset='vowel', split=0.7)
+#testClassifier(BayesClassifier(), dataset='iris', split=0.7)
+#testClassifier(BayesClassifier(), dataset='vowel', split=0.7)
+#plotBoundary(BayesClassifier(), dataset='iris', split=0.7)
+#plotBoundary(BayesClassifier(), dataset='vowel', split=0.7)
 
 
 # Call the `testClassifier` and `plotBoundary` functions for this part.
@@ -222,8 +221,8 @@ def trainBoost(base_classifier, X, labels, T=10):
         error = weightsum
         correctVote = np.where(vote == labels)[0]
         incorrectVote = np.where(vote != labels)[0]
-        for i in range(len(correctVote)):
-            error -= wCur[correctVote[i]]
+        for i in correctVote:
+            error -= wCur[i]
 
         #Adaboost step(3)
         alpha = (1/2) * (np.log(1 - error) - np.log(error))
@@ -297,16 +296,10 @@ class BoostClassifier(object):
 # Call the `testClassifier` and `plotBoundary` functions for this part.
 
 
-testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='iris',split=0.7)
-
-
-
-testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='vowel',split=0.7)
-
-
-
-plotBoundary(BoostClassifier(BayesClassifier()), dataset='iris',split=0.7)
-plotBoundary(BoostClassifier(BayesClassifier()), dataset='vowel',split=0.7)
+#testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='iris',split=0.7)
+#plotBoundary(BoostClassifier(BayesClassifier()), dataset='iris',split=0.7)
+testClassifier(BoostClassifier(BayesClassifier(), T=1), dataset='vowel', split=0.7)
+plotBoundary(BoostClassifier(BayesClassifier()), dataset='vowel', split=0.7)
 
 
 # Now repeat the steps with a decision tree classifier.
