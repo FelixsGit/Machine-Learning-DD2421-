@@ -41,14 +41,14 @@ def computePrior(labels, W=None):
 
     prior = np.zeros((Nclasses,1))
 
-    print("////////////////////////ASSIGMENT 2//////////////////////////")
+    #print("////////////////////////ASSIGMENT 2//////////////////////////")
 
     for jdx, c in enumerate(classes):
         idx = np.where(labels == c)[0]  # Vector of length C of indices for a given label class c
-        prior[c] = len(idx)/len(X)
+        prior[c] = len(idx)/len(labels)
 
-    print("PRIOR")
-    print(prior)
+    #print("PRIOR")
+    #print(prior)
     return prior
 
 # NOTE: you do not need to handle the W argument for this part!
@@ -69,7 +69,7 @@ def mlParams(X, labels, W=None):
     sigma = np.zeros((Nclasses, Ndims, Ndims))
 
 
-    print("////////////////////////ASSIGMENT 1//////////////////////////")
+    #print("////////////////////////ASSIGMENT 1//////////////////////////")
 
     mutot = np.zeros(Nclasses)
     for i in range(0, len(X)):
@@ -78,9 +78,9 @@ def mlParams(X, labels, W=None):
     for i in range(0, Nclasses):
         mu[i] = mu[i] / mutot[i]
 
-    print("MU")
-    print(mu)
-    print()
+    #print("MU")
+    #print(mu)
+    #print()
 
     varienceTot = np.zeros((Nclasses, Ndims))
 
@@ -92,8 +92,8 @@ def mlParams(X, labels, W=None):
         varienceTot[c] = varienceTot[c]/len(idx)
         sigma[c] = np.diag(varienceTot[c])
 
-    print("SIGMA")
-    print(sigma)
+    #print("SIGMA")
+    #print(sigma)
 
     return mu, sigma
 
@@ -107,15 +107,21 @@ def classifyBayes(X, prior, mu, sigma):
     Npts = X.shape[0]
     Nclasses, Ndims = np.shape(mu)
     logProb = np.zeros((Nclasses, Npts))
-    print(logProb)
 
-    for jdx in range(0, Nclasses):
-        differance = X - mu[jdx]
-        lnPrior = np.log(prior[jdx])
+    for jdx in range(Nclasses):
+        for i in range(Npts):
 
+            termOne = (1/2) * np.log(np.linalg.det(sigma[jdx]))
 
+            termTwoSubOne = X[i] - mu[jdx]
+            termTwoSubTwo = np.diag(1 / np.diag(sigma[jdx]))
+            termTwoSubThree = np.transpose(termTwoSubOne)
+            termTwo = (1/2) * np.linalg.multi_dot([termTwoSubOne, termTwoSubTwo, termTwoSubThree])
 
-    print(logProb)
+            termThree = np.log(prior[jdx])
+
+            logProb[jdx][i] = -termOne - termTwo + termThree
+
     # one possible way of finding max a-posteriori once
     # you have computed the log posterior
     h = np.argmax(logProb, axis=0)
@@ -146,11 +152,15 @@ class BayesClassifier(object):
 # Call `genBlobs` and `plotGaussian` to verify your estimates.
 
 
-X, labels = genBlobs(centers=5)
-mu, sigma = mlParams(X,labels)
-plotGaussian(X,labels,mu,sigma)
-prior = computePrior(labels)
-classifyBayes(X, prior, mu, sigma)
+#X, labels = genBlobs(centers=5)
+#mu, sigma = mlParams(X,labels)
+#plotGaussian(X,labels,mu,sigma)
+#prior = computePrior(labels)
+#classifier = classifyBayes(X, prior, mu, sigma)
+testClassifier(BayesClassifier(), dataset='iris', split=0.7)
+testClassifier(BayesClassifier(), dataset='vowel', split=0.7)
+plotBoundary(BayesClassifier(), dataset='iris', split=0.7)
+plotBoundary(BayesClassifier(), dataset='vowel', split=0.7)
 
 
 # Call the `testClassifier` and `plotBoundary` functions for this part.
