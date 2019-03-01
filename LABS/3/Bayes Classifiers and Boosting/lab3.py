@@ -70,7 +70,6 @@ def mlParams(X, labels, W=None):
 
     mu = np.zeros((Nclasses, Ndims))
     sigma = np.zeros((Nclasses, Ndims, Ndims))
-    print(sigma)
 
 
     #print("////////////////////////ASSIGMENT 1//////////////////////////")
@@ -82,18 +81,15 @@ def mlParams(X, labels, W=None):
     for i in range(0, Nclasses):
         mu[i] = mu[i] / mutot[i]
 
-    #print("MU")
-    #print(mu)
-    #print()
-    sum = 0
-    for j, c in enumerate(classes):
+    for idx, c in enumerate(classes):
         idx = np.where(labels == c)[0]
+        weightSum = sum(W[idx, :])
+        totSum = 0
         for i in range(0, len(idx)):
-            sum += np.square(X[idx[i]] - mu[c]) * W[idx[i]]
+            totSum += np.square(X[idx[i]] - mu[c]) * W[idx[i]]
 
-        sum = (1/np.sum(W[idx])) * sum
-        print(sum)
-
+        totSum = totSum / weightSum
+        sigma[c] = np.diag(totSum)
 
     return mu, sigma
 
@@ -149,8 +145,8 @@ class BayesClassifier(object):
 #plotGaussian(X,labels,mu,sigma)
 #prior = computePrior(labels)
 #classifier = classifyBayes(X, prior, mu, sigma)
-testClassifier(BayesClassifier(), dataset='iris', split=0.7)
-plotBoundary(BayesClassifier(), dataset='iris', split=0.7)
+#testClassifier(BayesClassifier(), dataset='iris', split=0.7)
+#plotBoundary(BayesClassifier(), dataset='iris', split=0.7)
 #testClassifier(BayesClassifier(), dataset='vowel', split=0.7)
 #plotBoundary(BayesClassifier(), dataset='vowel', split=0.7)
 
@@ -284,8 +280,8 @@ class BoostClassifier(object):
 # Call the `testClassifier` and `plotBoundary` functions for this part.
 
 
-#testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='iris', split=0.7)
-#plotBoundary(BoostClassifier(BayesClassifier()), dataset='iris',split=0.7)
+testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='iris', split=0.7)
+plotBoundary(BoostClassifier(BayesClassifier()), dataset='iris',split=0.7)
 #testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='vowel', split=0.7)
 #plotBoundary(BoostClassifier(BayesClassifier()), dataset='vowel', split=0.7)
 
