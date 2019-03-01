@@ -70,6 +70,7 @@ def mlParams(X, labels, W=None):
 
     mu = np.zeros((Nclasses, Ndims))
     sigma = np.zeros((Nclasses, Ndims, Ndims))
+    print(sigma)
 
 
     #print("////////////////////////ASSIGMENT 1//////////////////////////")
@@ -84,20 +85,15 @@ def mlParams(X, labels, W=None):
     #print("MU")
     #print(mu)
     #print()
-
-    varienceTot = np.zeros((Nclasses, Ndims))
-
-    for jdx, c in enumerate(classes):
-        idx = np.where(labels == c)[0] # Vector of length C of indices for a given label class c
-        weightsum = sum(W[idx, :])
+    sum = 0
+    for j, c in enumerate(classes):
+        idx = np.where(labels == c)[0]
         for i in range(0, len(idx)):
-            varienceTot[c] += W[i] * ((X[idx[i]] - mu[c]) * (X[idx[i]] - mu[c]))
+            sum += np.square(X[idx[i]] - mu[c]) * W[idx[i]]
 
-        varienceTot[c] = varienceTot[c]/weightsum
-        sigma[c] = np.diag(varienceTot[c])
+        sum = (1/np.sum(W[idx])) * sum
+        print(sum)
 
-    #print("SIGMA")
-    #print(sigma)
 
     return mu, sigma
 
@@ -107,24 +103,16 @@ def mlParams(X, labels, W=None):
 #      sigma - C x d x d matrix of class covariances (sigma[i] - class i sigma)
 # out:     h - N vector of class predictions for test points
 def classifyBayes(X, prior, mu, sigma):
-
     Npts = X.shape[0]
     Nclasses, Ndims = np.shape(mu)
     logProb = np.zeros((Nclasses, Npts))
 
     for jdx in range(Nclasses):
+        diff = X - mu[jdx]  # Matrix  C x d with diffs between x - µ
+        lnSigma = - np.log(np.linalg.det(sigma[jdx])) / 2  # N vector
+        lnPrior = np.log(prior[jdx])  # N vector
         for i in range(Npts):
-
-            termOne = (1/2) * np.log(np.linalg.det(sigma[jdx]))
-
-            termTwoSubOne = X[i] - mu[jdx]
-            termTwoSubTwo = np.diag(1 / np.diag(sigma[jdx]))
-            termTwoSubThree = np.transpose(termTwoSubOne)
-            termTwo = (1/2) * np.linalg.multi_dot([termTwoSubOne, termTwoSubTwo, termTwoSubThree])
-
-            termThree = np.log(prior[jdx])
-
-            logProb[jdx][i] = -termOne - termTwo + termThree
+            logProb[jdx][i] = lnSigma - np.inner(diff[i] / np.diag(sigma[jdx]), diff[i]) / 2 + lnPrior
 
     # one possible way of finding max a-posteriori once
     # you have computed the log posterior
@@ -161,9 +149,9 @@ class BayesClassifier(object):
 #plotGaussian(X,labels,mu,sigma)
 #prior = computePrior(labels)
 #classifier = classifyBayes(X, prior, mu, sigma)
-#testClassifier(BayesClassifier(), dataset='iris', split=0.7)
+testClassifier(BayesClassifier(), dataset='iris', split=0.7)
+plotBoundary(BayesClassifier(), dataset='iris', split=0.7)
 #testClassifier(BayesClassifier(), dataset='vowel', split=0.7)
-#plotBoundary(BayesClassifier(), dataset='iris', split=0.7)
 #plotBoundary(BayesClassifier(), dataset='vowel', split=0.7)
 
 
@@ -296,10 +284,10 @@ class BoostClassifier(object):
 # Call the `testClassifier` and `plotBoundary` functions for this part.
 
 
-#testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='iris',split=0.7)
+#testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='iris', split=0.7)
 #plotBoundary(BoostClassifier(BayesClassifier()), dataset='iris',split=0.7)
-testClassifier(BoostClassifier(BayesClassifier(), T=1), dataset='vowel', split=0.7)
-plotBoundary(BoostClassifier(BayesClassifier()), dataset='vowel', split=0.7)
+#testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='vowel', split=0.7)
+#plotBoundary(BoostClassifier(BayesClassifier()), dataset='vowel', split=0.7)
 
 
 # Now repeat the steps with a decision tree classifier.
